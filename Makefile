@@ -55,7 +55,7 @@ gobench: codis-deps
 	go test -gcflags -l -bench=. -v ./pkg/...
 
 docker:
-	docker build --force-rm -t codis-image .
+	docker build --force-rm -t codis-image:local .
 
 demo:
 	pushd example && make

@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: zookeeper
   labels:
-    app: zookeeper
+    app.kubernetes.io/name: zookeeper
 spec:
   ports:
   - port: 2888
@@ -12,4 +12,17 @@ spec:
     name: leader-election
   clusterIP: None
   selector:
-    app: zk
+    app.kubernetes.io/name: zookeeper
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zk-cs
+  labels:
+    app.kubernetes.io/name: zookeeper
+spec:
+  ports:
+  - port: 2181
+    name: client
+  selector:
+    app.kubernetes.io/name: zookeeper

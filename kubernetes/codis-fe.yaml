@@ -7,16 +7,16 @@ spec:
   template:
     metadata:
       labels:
-        app: codis-fe
+        app.kubernetes.io/name: codis-fe
     spec:
-      imagePullSecrets:
-      - name: your-registry
+      # imagePullSecrets:
+      # - name: your-registry
       containers:
       - name: codis-fe
-        image: codis-image
-        imagePullPolicy: IfNotPresent
+        image: codis-image:local
+        imagePullPolicy: Never
         command: ["codis-fe"]
-        args: ["-l","log/$(POD_NAME).log","--zookeeper","$(ZK_ADDR)","--listen=$(POD_IP):8080","--assets=$(CODIS_PATH)/bin/assets"]
+        args: ["--zookeeper","$(ZK_ADDR)","--listen=:8080","--assets=$(CODIS_PATH)/bin/assets"]
         env:
         - name: CODIS_PATH
           value: "/gopath/src/github.com/CodisLabs/codis"

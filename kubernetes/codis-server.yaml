@@ -1,14 +1,17 @@
-apiVersion: "apps/v1beta1"
+apiVersion: "apps/v1"
 kind: StatefulSet
 metadata:
   name: codis-server
 spec:
   serviceName: codis-server
   replicas: 4
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: codis-server
   template:
     metadata:
       labels:
-        app: codis-server
+        app.kubernetes.io/name: codis-server
       annotations:
         scheduler.alpha.kubernetes.io/affinity: >
             {
@@ -27,14 +30,14 @@ spec:
               }
             }
     spec:
-      imagePullSecrets:
-      - name: your-registry
+      # imagePullSecrets:
+      # - name: your-registry
       containers:
       - name: codis-server
-        image: codis-image
-        imagePullPolicy: IfNotPresent
+        image: codis-image:local
+        imagePullPolicy: Never
         command: ["codis-server"]
-        args: ["$(CODIS_PATH)/config/redis.conf","--logfile","$(POD_NAME).log","--protected-mode", "no", "--bind", "$(POD_IP)", "--daemonize", "no"]
+        args: ["$(CODIS_PATH)/config/redis.conf","--protected-mode", "no", "--bind", "$(POD_IP)", "--daemonize", "no"]
         lifecycle:
           postStart:
             exec:

@@ -19,20 +19,23 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: zk
+      app.kubernetes.io/name: zk
   minAvailable: 2
 ---
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: zk
 spec:
   serviceName: zookeeper
   replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: zookeeper
   template:
     metadata:
       labels:
-        app: zk
+        app.kubernetes.io/name: zookeeper
       annotations:
         pod.alpha.kubernetes.io/initialized: "true"
         scheduler.alpha.kubernetes.io/affinity: >

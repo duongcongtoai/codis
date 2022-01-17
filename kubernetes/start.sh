@@ -1,10 +1,10 @@
 #!/bin/bash
 
-if [ $(kubectl get pods -l app=zk |grep Running |wc -l) == 0 ]; then
+if [ $(kubectl get pods -l app.kubernetes.io/name=zk |grep Running |wc -l) == 0 ]; then
     echo "start create zookeeper cluster"
     kubectl create -f zookeeper/zookeeper-service.yaml
     kubectl create -f zookeeper/zookeeper.yaml
-    while [ $(kubectl get pods -l app=zk |grep Running |wc -l) != 3 ]; do sleep 1; done;
+    while [ $(kubectl get pods -l app.kubernetes.io/name=zookeeper|grep Running |wc -l) != 3 ]; do sleep 1; done;
     echo "finish create zookeeper cluster"
 fi
 
@@ -26,11 +26,11 @@ buildup)
     kubectl exec -it zk-0 -- zkCli.sh -server zk-0:2181 rmr /codis3/$product_name
     kubectl create -f codis-service.yaml
     kubectl create -f codis-dashboard.yaml
-    while [ $(kubectl get pods -l app=codis-dashboard |grep Running |wc -l) != 1 ]; do sleep 1; done;
+    while [ $(kubectl get pods -l app.kubernetes.io/name=codis-dashboard |grep Running |wc -l) != 1 ]; do sleep 1; done;
     kubectl create -f codis-proxy.yaml
     kubectl create -f codis-server.yaml
     servers=$(grep "replicas" codis-server.yaml |awk  '{print $2}')
-    while [ $(kubectl get pods -l app=codis-server |grep Running |wc -l) != $servers ]; do sleep 1; done;
+    while [ $(kubectl get pods -l app.kubernetes.io/name=codis-server |grep Running |wc -l) != $servers ]; do sleep 1; done;
     kubectl exec -it codis-server-0 -- codis-admin  --dashboard=codis-dashboard:18080 --rebalance --confirm
     kubectl create -f codis-ha.yaml
     kubectl create -f codis-fe.yaml
@@ -56,7 +56,7 @@ scale-server)
         echo "current server == desired server, return"
     elif [ $cur -lt $des ]; then
         kubectl scale statefulsets codis-server --replicas=$des
-        while [ $(kubectl get pods -l app=codis-server |grep Running |wc -l) != $2 ]; do sleep 1; done;
+        while [ $(kubectl get pods -l app.kubernetes.io/name=codis-server |grep Running |wc -l) != $2 ]; do sleep 1; done;
         kubectl exec -it codis-server-0 -- codis-admin  --dashboard=codis-dashboard:18080 --rebalance --confirm
     else
         echo "reduce the number of codis-server, does not support, please wait"
