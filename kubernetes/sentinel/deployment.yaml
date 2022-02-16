@@ -1,49 +1,20 @@
 apiVersion: v1
-kind: DeploymentConfig
+kind: ReplicationController
 metadata:
   name: redis-sentinel
 spec:
   replicas: 1
-  selector:
-    redis-sentinel: "true"
   template:
     metadata:
       labels:
-        name: redis-sentinel
-        redis-sentinel: "true"
-        role: sentinel
+        app.kubernetes.io/name: redis-setinel
     spec:
       containers:
       - name: sentinel
-        image: bibinwilson/redis:4.1
+        image: local-redis:v1
         env:
           - name: SENTINEL
             value: "true"
-        readinessProbe:
-          tcpSocket:
-            port: 26379
-          initialDelaySeconds: 5
-          timeoutSeconds: 1
-          periodSeconds: 15
-        livenessProbe:
-          tcpSocket:
-            port: 26379
-          initialDelaySeconds: 15
-          timeoutSeconds: 1
-          periodSeconds: 15
-        resources:
-          limits:
-            cpu: 500m
-            memory: 1Gi
-          requests:
-            cpu: 500m
-            memory: 1Gi
         ports:
           - containerPort: 26379
-            protocol: TCP
-        volumeMounts:
-        - mountPath: /redis-sentinel-data
-          name: data
-      volumes:
-        - name: data
-          emptyDir: {}
+            name: sentinel
